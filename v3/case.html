@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-theme="neutral">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case Study — Aaliyah Rose (Draft V3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* V3 case study, same format as the Framer build: hero images full-bleed first, the overview after */
+  :root { --ink: #0d0d0d; --paper: #f4f1ec; --line: rgba(244, 241, 236, .16); --muted: rgba(244, 241, 236, .55); --gutter: clamp(16px, 2.4vw, 32px); --ease: cubic-bezier(.22, .8, .2, 1); }
+  [data-theme="neutral"] { --accent: #cbbfae; }
+  [data-theme="mugunghwa"] { --accent: #e0457b; }
+  [data-theme="green"] { --accent: #86b394; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--ink); color: var(--paper); font: 400 15px/1.5 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
+  .muted { color: var(--muted); }
+
+  .bar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: center; padding: 16px 0 8px; }
+  .pill { display: grid; grid-template-columns: 1fr auto; gap: 2px 24px; min-width: min(440px, 92vw); padding: 8px 14px; background: rgba(13,13,13,.62); border: 1px solid var(--line); border-radius: 6px; backdrop-filter: blur(8px); }
+  .pill .crumb { color: var(--accent); }
+  .pill a:hover { color: var(--accent); }
+
+  .gallery { display: grid; gap: 8px; padding: 0 var(--gutter); }
+  .gallery img { display: block; width: 100%; height: auto; border-radius: 5px; background: #1a1a1a; }
+  /* square logo animations: centred in a 16:9 white frame, edges feathered so shapes drift in rather than being cut off */
+  .gallery video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #fff; border-radius: 5px;
+    --fx: linear-gradient(to right, transparent 21.9%, #000 27.5%, #000 72.5%, transparent 78.1%);
+    --fy: linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: var(--fx), var(--fy); -webkit-mask-composite: source-in; mask-image: var(--fx), var(--fy); mask-composite: intersect; }
+  .gallery figure:has(video), .gallery video { background-color: #fff; }
+
+  .overview { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 8px; margin: 8px var(--gutter) 0; padding: 24px 0 96px; border-top: 1px solid var(--line); }
+  .overview h1 { font-weight: 700; font-size: clamp(36px, 5.2vw, 84px); line-height: .92; letter-spacing: -.02em; text-transform: uppercase; hyphens: none; }
+  .overview .kind { margin-top: 12px; color: var(--accent); }
+  .sections { display: grid; gap: 24px; }
+  .sections h2 { margin-bottom: 8px; }
+  .sections p { font-size: 15px; line-height: 1.55; max-width: 62ch; text-wrap: pretty; }
+  .details { margin-top: 8px; border-bottom: 1px solid var(--line); }
+  .details div { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .details dd { font-size: 14px; }
+
+  .next { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 0 var(--gutter); padding: 22px 0; border-top: 1px solid var(--line); }
+  .next strong { font-weight: 700; font-size: clamp(24px, 3.6vw, 56px); line-height: 1; text-transform: uppercase; letter-spacing: -.015em; transition: color .3s; }
+  .next:hover strong { color: var(--accent); }
+  footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px var(--gutter) 24px; border-top: 1px solid var(--line); }
+
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 1s ease, transform 1.2s var(--ease); transition-delay: var(--d, 0s); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (max-width: 860px) { .overview { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="bar">
+  <nav class="pill mono"><a href="index.html">← Aaliyah Rose</a><a href="index.html#work" style="justify-self:end">All work</a><span class="crumb" id="crumb">Work:</span><span class="muted" id="count" style="justify-self:end"></span></nav>
+</header>
+<main>
+  <section class="gallery" id="gallery" aria-label="Project images"></section>
+  <section class="overview">
+    <div><h1 id="title" class="reveal"></h1><p class="kind mono reveal" id="kind" style="--d:.1s"></p></div>
+    <div>
+      <div class="sections" id="sections"></div>
+      <dl class="details mono reveal" id="details" style="--d:.2s"></dl>
+    </div>
+  </section>
+  <a class="next" id="next"><span class="mono muted">Next project →</span><strong id="nextName"></strong></a>
+</main>
+<footer class="mono">
+  <a href="mailto:thisisaaliyahrose@gmail.com">thisisaaliyahrose@gmail.com</a>
+  <span class="muted">© 2026 Aaliyah Rose — Draft V3</span>
+  <a href="#">Back to top ↑</a>
+</footer>
+
+<script src="../shared/projects.js"></script>
+<script>
+  try { const t = localStorage.getItem("v3-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  const slug = new URLSearchParams(location.search).get("p") || PROJECTS[0].slug;
+  const i = Math.max(0, PROJECTS.findIndex(p => p.slug === slug));
+  const p = PROJECTS[i], n = PROJECTS[(i + 1) % PROJECTS.length];
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  document.title = `${p.name} — Aaliyah Rose (Draft V3)`;
+  document.getElementById("crumb").textContent = `Work: ${p.name}`;
+  document.getElementById("count").textContent = `${String(i + 1).padStart(2, "0")} / ${String(PROJECTS.length).padStart(2, "0")}`;
+  document.getElementById("gallery").innerHTML = p.images.map((src, k) => src.endsWith(".mp4") ? `<video class="reveal" src="${src}" autoplay muted loop playsinline aria-label="${esc(p.name)}, animation"></video>` : `<img class="reveal" src="${src}" alt="${esc(p.name)}, image ${k + 1}" loading="${k ? "lazy" : "eager"}">`).join("");
+  document.getElementById("title").textContent = p.name;
+  document.getElementById("kind").textContent = p.kind;
+  document.getElementById("sections").innerHTML = p.sections.map(([h, t], k) => `<article class="reveal" style="--d:${.1 + k * .06}s"><h2 class="mono muted">${esc(h)}</h2><p>${esc(t)}</p></article>`).join("");
+  document.getElementById("details").innerHTML = p.details.map(([k, v]) => `<div><dt class="muted">${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+  document.getElementById("next").href = `case.html?p=${n.slug}`;
+  document.getElementById("nextName").textContent = n.name;
+
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .08 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
