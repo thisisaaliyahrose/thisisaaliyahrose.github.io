@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="neutral">
+<html lang="en" data-theme="mugunghwa">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,9 +19,12 @@
     --gutter: clamp(16px, 2.4vw, 32px);
     color-scheme: light;
   }
-  [data-theme="neutral"] { --accent: #cbbfae; --accent-rgb: 150, 138, 120; --foot-bg: #ece8e1; --foot-ink: #0d0d0d; }
-  [data-theme="mugunghwa"] { --accent: #e0457b; --accent-rgb: 224, 69, 123; --foot-bg: #e0457b; --foot-ink: #0d0d0d; }
-  [data-theme="green"] { --accent: #86b394; --accent-rgb: 46, 94, 69; --foot-bg: #1f4d3a; --foot-ink: #ece8e1; }
+  /* Each palette repaints the whole landing field (background, wordmark, dots), not just the accents.
+     --dot-rgb is the resting dot grid, --hot-rgb the dots that swell around the cursor. */
+  [data-theme="mugunghwa"] { --field: #e0457b; --field-ink: #0d0d0d; --dot-rgb: 13, 13, 13; --hot-rgb: 244, 241, 236; --accent: #e0457b; --foot-bg: #e0457b; --foot-ink: #0d0d0d; }
+  [data-theme="green"] { --field: #1f4d3a; --field-ink: #ece8e1; --dot-rgb: 236, 232, 225; --hot-rgb: 134, 179, 148; --accent: #86b394; --foot-bg: #1f4d3a; --foot-ink: #ece8e1; }
+  [data-theme="ink"] { --field: #0d0d0d; --field-ink: #f4f1ec; --dot-rgb: 244, 241, 236; --hot-rgb: 224, 69, 123; --accent: #e0457b; --foot-bg: #f4f1ec; --foot-ink: #0d0d0d; }
+  [data-theme="neutral"] { --field: #ece8e1; --field-ink: #0d0d0d; --dot-rgb: 13, 13, 13; --hot-rgb: 150, 138, 120; --accent: #cbbfae; --foot-bg: #ece8e1; --foot-ink: #0d0d0d; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { background: var(--ink); color: var(--paper); font: 500 14px/1.4 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
@@ -30,7 +33,7 @@
   .caps { text-transform: uppercase; }
 
   /* ---------- landing: bone field, quiet dot grid, the full wordmark ---------- */
-  .field { position: relative; height: 100svh; min-height: 620px; background: var(--field); color: var(--ink); overflow: hidden; }
+  .field { position: relative; height: 100svh; min-height: 620px; background: var(--field); color: var(--field-ink); overflow: hidden; transition: background-color .8s var(--ease), color .8s var(--ease); }
   .dots { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .top, .bottom { position: absolute; left: var(--gutter); right: var(--gutter); display: flex; justify-content: space-between; align-items: center; z-index: 2; }
   .top { top: 18px; } .bottom { bottom: 20px; align-items: end; gap: 24px; }
@@ -97,13 +100,13 @@
   </div>
   <div class="mark" id="mark" role="img" aria-label="Aaliyah Rose"></div>
   <div class="bottom">
-    <p class="tagline caps">Visual designer<br>Branding, typography, print + hand lettering</p>
+    <p class="tagline caps">Visual designer<br>Branding, typography, print, and hand&nbsp;lettering</p>
     <a class="mono" href="#about">Scroll ↓</a>
   </div>
 </section>
 
 <section class="statement" id="about">
-  <div class="label mono"><span>(About)</span><span>Korean + Jamaican — BFA SCAD / MFA ArtCenter</span></div>
+  <div class="label mono"><span>(About)</span><span>Korean + Jamaican — MFA ArtCenter / BFA&nbsp;SCAD</span></div>
   <p data-words>I grew up as the one in the room who looked <em class="hot">different.</em></p>
   <p data-words>My differences weren’t something to hide. They were the <em class="hot">conversation.</em></p>
   <p data-words>I design to preserve culture, start real conversations and make people feel <em class="hot">seen.</em></p>
@@ -131,9 +134,10 @@
 
 <div class="palette mono" id="palette" aria-label="Draft palette">
   <span style="opacity:.6;padding-left:4px">Palette</span>
-  <button data-t="neutral"><i style="background:#cbbfae"></i>Neutral</button>
   <button data-t="mugunghwa"><i style="background:#e0457b"></i>Mugunghwa</button>
   <button data-t="green"><i style="background:#1f4d3a;box-shadow:0 0 0 1px #86b394"></i>Green</button>
+  <button data-t="ink"><i style="background:#0d0d0d;box-shadow:0 0 0 1px #f4f1ec"></i>Ink</button>
+  <button data-t="neutral"><i style="background:#ece8e1"></i>Bone</button>
 </div>
 
 <script src="../shared/projects.js"></script>
@@ -145,10 +149,10 @@
   const setTheme = t => {
     root.dataset.theme = t;
     document.querySelectorAll("#palette button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === t)));
-    try { localStorage.setItem("v3-theme", t); } catch (e) {}
+    try { localStorage.setItem("v3-field", t); } catch (e) {}
   };
-  let saved = null; try { saved = localStorage.getItem("v3-theme"); } catch (e) {}
-  setTheme(saved || "neutral");
+  let saved = null; try { saved = localStorage.getItem("v3-field"); } catch (e) {}
+  setTheme(saved || "mugunghwa");
   document.querySelectorAll("#palette button").forEach(b => b.addEventListener("click", () => setTheme(b.dataset.t)));
 
   // ---- landing: a quiet dot grid; dots near the cursor swell and take the accent colour ----
@@ -160,14 +164,14 @@
   field.addEventListener("pointerleave", () => { mx = my = -9999; });
   (function draw(t) {
     ex += (mx - ex) * .12; ey += (my - ey) * .12;
-    const acc = getComputedStyle(root).getPropertyValue("--accent-rgb").trim() || "150,138,120";
+    const cs = getComputedStyle(root), acc = cs.getPropertyValue("--hot-rgb").trim() || "150,138,120", rest = cs.getPropertyValue("--dot-rgb").trim() || "13,13,13";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const cell = Math.max(24, Math.min(W, H) / 20), R = 240;
     for (let y = cell / 2; y < H; y += cell) for (let x = cell / 2; x < W; x += cell) {
       const d = Math.hypot(x - ex, y - ey), k = Math.max(0, 1 - d / R);
       const wave = reduce ? 0 : .5 + .5 * Math.sin(t / 1600 + x * .01 + y * .013);
       const r = cell * (.045 + .02 * wave + .3 * k * k);
-      ctx.fillStyle = k > .02 ? `rgba(${acc}, ${.35 + .6 * k})` : "rgba(13, 13, 13, .22)";
+      ctx.fillStyle = k > .02 ? `rgba(${acc}, ${.35 + .6 * k})` : `rgba(${rest}, .24)`;
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     }
     requestAnimationFrame(draw);

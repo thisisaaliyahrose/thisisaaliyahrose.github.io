@@ -16,6 +16,7 @@
     --rule: rgba(17, 17, 17, .14);
     --rule-strong: rgba(17, 17, 17, .38);
     --signal: #ff3b1f;
+    --folder: #e4dccb;
     --ease: cubic-bezier(.22, .8, .2, 1);
     --gutter: clamp(16px, 2.4vw, 32px);
     color-scheme: light;
@@ -49,13 +50,23 @@
   .geo { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ink); }
   .geo .g-line { stroke: var(--rule); stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
   .geo .g-strong { stroke: var(--rule-strong); }
+  .geo .g-metric { stroke: rgba(17, 17, 17, .3); stroke-dasharray: 4 4; }
+  .geo .g-base { stroke: var(--ink); stroke-width: 1; }
+  .geo .g-ink { stroke: var(--ink); stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity .6s ease; }
+  .done .geo .g-ink { opacity: 1; }
   .geo .g-draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.2s var(--ease); }
   .ready .geo .g-draw { stroke-dashoffset: 0; }
-  .wordmark { position: absolute; left: 50%; top: 50%; width: min(78vw, 1100px); translate: -50% -50%; color: var(--ink); }
-  .wordmark svg { visibility: hidden; }
+  .wordmark { position: absolute; left: 50%; top: 50%; width: min(74vw, 1040px); translate: -50% -50%; color: var(--ink); clip-path: inset(-20% 100% -20% 0); }
   .wordmark svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .note { position: absolute; opacity: 0; transition: opacity .8s ease 1.6s; white-space: nowrap; pointer-events: none; }
+  /* the T-square: a red drafting rule that sweeps across and inks the wordmark */
+  .tsq { position: absolute; z-index: 3; width: 1px; background: var(--signal); opacity: 0; pointer-events: none; }
+  .tsq span { position: absolute; left: 6px; top: -18px; color: var(--signal); white-space: nowrap; }
+  .sweeping .tsq { opacity: 1; }
+  .note { position: absolute; opacity: 0; transition: opacity .8s ease 1.2s; white-space: nowrap; pointer-events: none; font-size: 10px; line-height: 1; }
+  .note.r { translate: -100% 0; } .note.c { translate: -50% 0; }
+  .note.v { writing-mode: vertical-rl; translate: 0 -50%; }
   .ready .note { opacity: 1; }
+  .note.late { transition-delay: 0s; } .ready .note.late { opacity: 0; } .done .note.late { opacity: 1; }
   .sheet-foot { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 22px; display: flex; justify-content: space-between; align-items: end; }
   .sheet-foot h1 { font-weight: 600; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.2; hyphens: none; }
 
@@ -70,20 +81,32 @@
   section { padding: 96px var(--gutter); }
   .sec-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
   .sec-head h2 { font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
-  .index { list-style: none; }
+  /* each project is a manila folder; the Fig. tabs step across the drawer like a real file cabinet */
+  .index { list-style: none; padding-top: 6px; --tw: 132px; }
+  .index li { margin-top: 34px; }
   .index a {
-    display: grid; grid-template-columns: 64px 1fr minmax(160px, 22%) 120px; align-items: center; gap: 16px;
-    padding: 14px 10px; border-bottom: 1px solid var(--rule); transition: background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease);
+    position: relative; display: grid; grid-template-columns: 1fr minmax(160px, 22%) 120px; align-items: center; gap: 16px;
+    padding: 20px 20px 18px; background: var(--folder); border: 1px solid var(--ink); border-radius: 6px;
+    transition: background .35s var(--ease), color .35s var(--ease), transform .35s var(--ease);
   }
+  .index li[data-t="0"] a { border-top-left-radius: 0; }
+  .index li[data-t="3"] a { border-top-right-radius: 0; }
+  .index .tab {
+    position: absolute; bottom: 100%; left: calc((100% - var(--tw)) * var(--t) / 3); width: var(--tw); height: 25px; margin-bottom: -1px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+    background: var(--folder); border: 1px solid var(--ink); border-bottom: 0; border-radius: 6px 6px 0 0;
+    transition: background .35s var(--ease), color .35s var(--ease);
+  }
+  .index a:hover, .index a:hover .tab { background: var(--ink); color: var(--paper); }
+  .index a:hover { transform: translateY(-4px); }
   .index .name { font-weight: 500; font-size: clamp(26px, 4.2vw, 60px); line-height: 1; text-transform: uppercase; letter-spacing: -.01em; }
   .index .num, .index .kind, .index .go { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; }
   .index .go { text-align: right; }
-  .index a:hover { background: var(--ink); color: var(--paper); padding-left: 22px; }
-  .peek { position: fixed; z-index: 30; width: min(34vw, 420px); aspect-ratio: 16 / 9; pointer-events: none; opacity: 0; scale: .96; transition: opacity .25s, scale .35s var(--ease); border: 1px solid var(--ink); background: var(--ink); }
+  .peek { position: fixed; z-index: 30; width: min(34vw, 420px); aspect-ratio: 16 / 9; pointer-events: none; opacity: 0; scale: .96; transition: opacity .25s, scale .35s var(--ease); border: 1px solid var(--ink); border-radius: 0 6px 6px 6px; background: var(--folder); padding: 6px; }
   .peek.on { opacity: 1; scale: 1; }
-  .peek img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .25s; }
+  .peek img { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-fit: cover; border-radius: 3px; opacity: 0; transition: opacity .25s; }
   .peek img.show { opacity: 1; }
-  .peek .tag { position: absolute; left: 0; top: -20px; color: var(--ink); }
+  .peek .tag { position: absolute; left: -1px; bottom: 100%; height: 25px; margin-bottom: -1px; display: flex; align-items: center; padding: 0 12px; background: var(--folder); border: 1px solid var(--ink); border-bottom: 0; border-radius: 6px 6px 0 0; color: var(--ink); white-space: nowrap; }
 
   /* ---------- about ---------- */
   .about { display: grid; grid-template-columns: minmax(140px, 1fr) 3fr; gap: 24px; border-top: 1px solid var(--rule); }
@@ -102,14 +125,14 @@
 
   @media (max-width: 760px) {
     .bar { grid-template-columns: 1fr auto; } .bar nav { display: none; }
-    .index a { grid-template-columns: 40px 1fr; } .index .kind, .index .go { display: none; }
+    .index { --tw: 96px; } .index a { grid-template-columns: 1fr; } .index .kind, .index .go { display: none; }
     .about { grid-template-columns: 1fr; } .facts { grid-template-columns: 1fr; }
     .note.optional { display: none; }
   }
   /* ink.js paper texture: keep it a whisper on light paper */
   .ink-paper { opacity: .035 !important; }
   .ink-grain { opacity: .05 !important; }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .wordmark { clip-path: none; } }
 </style>
 </head>
 <body>
@@ -124,10 +147,11 @@
   <div class="sheet" id="sheet">
     <svg class="geo" id="geo" aria-hidden="true"></svg>
     <div class="wordmark" id="wordmark" role="img" aria-label="Aaliyah Rose"></div>
+    <div class="tsq" id="tsq"><span class="mono">X 0000</span></div>
     <div class="xh h" id="xh"></div><div class="xh v" id="xv"></div>
     <div class="readout mono" id="readout">X 000 / Y 000</div>
     <div class="sheet-foot">
-      <h1 class="caps">Visual designer<br>Branding, typography,<br>print + hand lettering</h1>
+      <h1 class="caps">Visual designer<br>Branding, typography,<br>print, and hand&nbsp;lettering</h1>
       <a class="mono" href="#work">Index of work (08) ↓</a>
     </div>
   </div>
@@ -142,8 +166,8 @@
     <div>
       <p class="lead reveal">Korean and Jamaican, raised around many cultures at one table. I design to preserve culture, start real conversations and make people feel seen.</p>
       <div class="facts mono reveal" style="--d:.15s">
-        <span><span class="muted">Education</span><br>BFA, SCAD<br>MFA, ArtCenter College of Design</span>
-        <span><span class="muted">Practice</span><br>Branding, Typography<br>Print, Hand-lettering</span>
+        <span><span class="muted">Education</span><br>Spring 2027 | MFA in graphic design,<br>ArtCenter College of Design<br><br>Spring 2025 | BFA in graphic design,<br>Savannah College of Art and Design</span>
+        <span><span class="muted">Practice</span><br>Branding, Typography,<br>Print, and Hand&nbsp;lettering</span>
         <span><span class="muted">Happiest</span><br>With ink on my hands</span>
       </div>
     </div>
@@ -163,8 +187,7 @@
 
 <div class="peek" id="peek"><span class="tag mono" id="peekTag"></span></div>
 
-<svg id="trace-wordmark" hidden></svg>
-<script src="../shared/ink.js?v=8"></script>
+<script src="../shared/ink.js?v=9"></script>
 <script src="../shared/projects.js"></script>
 <script>
 
@@ -173,7 +196,8 @@
   PROJECTS.forEach(({ slug, name, kind, images }, i) => {
     const li = document.createElement("li");
     li.className = "reveal"; li.style.setProperty("--d", `${i * 0.05}s`);
-    li.innerHTML = `<a href="case.html?p=${slug}" data-ground="#efede8"><span class="num">${String(i + 1).padStart(2, "0")}</span><span class="name">${name}</span><span class="kind">${kind}</span><span class="go">Open ↗</span></a>`;
+    li.dataset.t = i % 4; li.style.setProperty("--t", i % 4);
+    li.innerHTML = `<a href="case.html?p=${slug}" data-ground="#efede8"><span class="tab mono"><span>Fig.</span><span>${String(i + 1).padStart(2, "0")}</span></span><span class="name">${name}</span><span class="kind">${kind}</span><span class="go">Open ↗</span></a>`;
     list.appendChild(li);
     const pic = new Image(); pic.src = images.find(s => !s.endsWith(".mp4")); pic.alt = ""; peek.appendChild(pic);
     li.addEventListener("mouseenter", () => {
@@ -188,41 +212,92 @@
   (function follow() { px += (tx - px) * .18; py += (ty - py) * .18; peek.style.transform = `translate(${px}px, ${py}px)`; requestAnimationFrame(follow); })();
   peek.style.left = "0"; peek.style.top = "0";
 
-  // ---- construction sheet: grid, circles and diagonals built around the wordmark ----
+  // ---- construction sheet: every guide is taken from the wordmark itself ----
+  // Type metrics measured from the letterforms, as fractions of the wordmark's height:
+  // ascender = top of the A and R swashes, cap height = top of the small caps, baseline = where they sit.
+  // (It's set in small caps, so there is no x-height or mean line to draw.)
+  const METRICS = { ascender: .022, cap: .295, baseline: .948 };
   const NS = "http://www.w3.org/2000/svg";
   const sheet = document.getElementById("sheet"), geo = document.getElementById("geo"), mark = document.getElementById("wordmark");
   const notes = [];
+  let box = null;
   function build() {
     const W = sheet.clientWidth, H = sheet.clientHeight;
     geo.setAttribute("viewBox", `0 0 ${W} ${H}`);
     geo.innerHTML = ""; notes.forEach(n => n.remove()); notes.length = 0;
     const r = mark.getBoundingClientRect(), s = sheet.getBoundingClientRect();
-    const L = r.left - s.left, T = r.top - s.top, R = L + r.width, B = T + r.height, cx = (L + R) / 2, cy = (T + B) / 2;
+    const L = r.left - s.left, T = r.top - s.top, w = r.width, h = r.height, R = L + w, B = T + h, cx = L + w / 2, cy = T + h / 2;
+    const y = f => T + f * h;
+    const asc = y(METRICS.ascender), cap = y(METRICS.cap), base = y(METRICS.baseline);
+    const g = Math.max(16, Math.min(32, W * .024));           // the page gutter, so the grid shares the page margins
+    box = { L, R, T, B, w, h, asc, base };
     const add = (tag, attrs, cls = "g-line g-draw") => {
       const el = document.createElementNS(NS, tag);
       Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
       el.setAttribute("class", cls); el.setAttribute("pathLength", 1); geo.appendChild(el); return el;
     };
-    // 12-column field
-    const cols = 12, step = W / cols;
-    for (let i = 1; i < cols; i++) add("line", { x1: i * step, y1: 0, x2: i * step, y2: H });
-    for (let y = step; y < H; y += step) add("line", { x1: 0, y1: y, x2: W, y2: y });
-    // the wordmark's bounding box, centre lines and diagonals
-    [[L, 0, L, H], [R, 0, R, H], [0, T, W, T], [0, B, W, B]].forEach(([a, b, c, d]) => add("line", { x1: a, y1: b, x2: c, y2: d }, "g-line g-strong g-draw"));
-    add("line", { x1: cx, y1: 0, x2: cx, y2: H }); add("line", { x1: 0, y1: cy, x2: W, y2: cy });
-    add("line", { x1: L, y1: T, x2: R, y2: B }); add("line", { x1: R, y1: T, x2: L, y2: B });
-    // construction circles, from the cap height out to the frame
-    const h = B - T;
-    [h / 2, h, h * 1.9, Math.hypot(r.width, h) / 2].forEach((rad, i) => add("circle", { cx, cy, r: rad }, i === 3 ? "g-line g-strong g-draw" : "g-line g-draw"));
-    [L + h / 2, R - h / 2].forEach(x => add("circle", { cx: x, cy, r: h / 2 }));
+    const line = (x1, y1, x2, y2, cls) => add("line", { x1, y1, x2, y2 }, cls);
+
+    // 12 equal columns between equal margins, mirrored about the Y axis
+    for (let i = 0; i <= 12; i++) { const x = g + i * (W - 2 * g) / 12; line(x, 0, x, H, i === 0 || i === 12 ? "g-line g-strong g-draw" : undefined); }
+    // baseline grid: a quarter of the cap height, counted out from the baseline in both directions
+    const u = (base - cap) / 4;
+    for (let k = -Math.ceil(base / u); k * u + base <= H; k++) { if (k) line(0, base + k * u, W, base + k * u); }
+    // X and Y axes through the centre of the wordmark
+    line(0, cy, W, cy, "g-line g-strong g-draw"); line(cx, 0, cx, H, "g-line g-strong g-draw");
+    // type metrics, full width: ascender and cap height (dashed) and the baseline (solid ink)
+    [asc, cap].forEach(v => line(0, v, W, v, "g-line g-metric g-draw"));
+    line(0, base, W, base, "g-line g-base g-draw");
+    // the wordmark's frame and its diagonals
+    [[L, 0, L, H], [R, 0, R, H]].forEach(c => line(...c, "g-line g-strong g-draw"));
+    line(L, asc, R, base); line(R, asc, L, base);
+    // construction circles, all concentric on the centre: half height, full height, and the circle through both ends
+    [h / 2, h, w / 2].forEach((rad, i) => add("circle", { cx, cy, r: rad }, i === 2 ? "g-line g-strong g-draw" : "g-line g-draw"));
+    // a matching pair on the two swash capitals, mirrored
+    const sw = (base - asc) / 2;
+    [L + sw, R - sw].forEach(x => add("circle", { cx: x, cy: asc + sw, r: sw }));
+    // dimension lines: width above, height on the right
+    const dy = asc - 26, dx = R + 40;
+    line(L, dy, R, dy, "g-ink"); [L, R].forEach(x => line(x, dy - 5, x, dy + 5, "g-ink"));
+    line(dx, asc, dx, base, "g-ink"); [asc, base].forEach(v => line(dx - 5, v, dx + 5, v, "g-ink"));
+    // printer's crop marks at the four corners, and registration targets on the X axis, mirrored
+    const cm = 14, off = 10;
+    [[L - off, asc - off, -1, -1], [R + off, asc - off, 1, -1], [L - off, base + off, -1, 1], [R + off, base + off, 1, 1]].forEach(([x, v, sx, sy]) => {
+      line(x, v, x + sx * cm, v, "g-ink"); line(x, v, x, v + sy * cm, "g-ink");
+    });
+    const ry = Math.min(84, asc - 70);
+    [ry, H - ry].forEach(v => { add("circle", { cx, cy: v, r: 7 }, "g-ink"); line(cx - 12, v, cx + 12, v, "g-ink"); line(cx, v - 12, cx, v + 12, "g-ink"); });
     // staggered draw-in
-    [...geo.children].forEach((el, i) => { el.style.transitionDelay = `${Math.min(i * 0.025, 1.2)}s`; });
-    // annotations
-    const note = (x, y, text, cls = "") => { const n = document.createElement("span"); n.className = `note mono muted ${cls}`; n.style.left = `${x}px`; n.style.top = `${y}px`; n.textContent = text; sheet.appendChild(n); notes.push(n); };
-    note(L, T - 22, "Fig. 01 — Wordmark");
-    note(R - 150, B + 8, `${Math.round(r.width)} × ${Math.round(h)} PX`, "optional");
-    note(cx + 8, 64, "Axis 0.5", "optional");
-    note(8, cy - 18, "Baseline grid / 12 col", "optional");
+    [...geo.querySelectorAll(".g-draw")].forEach((el, i) => { el.style.transitionDelay = `${Math.min(i * 0.02, 1)}s`; });
+
+    // annotations: metric names on the left margin, their height above the baseline mirrored on the right
+    const note = (x, v, text, cls = "") => { const n = document.createElement("span"); n.className = `note mono muted ${cls}`; n.style.left = `${x}px`; n.style.top = `${v}px`; n.textContent = text; sheet.appendChild(n); notes.push(n); };
+    [["Ascender", asc], ["Cap height", cap], ["Baseline", base]].forEach(([name, v]) => {
+      note(g + 6, v - 13, name);
+      note(W - g - 6, v - 13, v === base ? "0" : `+${Math.round(base - v)}`, "r optional");
+    });
+    note(cx + 16, ry - 5, "Y", ""); note(g + 6, cy - 13, "X", "");
+    note(cx, dy - 15, `${Math.round(w)} PX`, "c late");
+    note(dx + 8, (asc + base) / 2, `${Math.round(base - asc)} PX`, "late optional v");
+    note(L - off, base + off + 20, "Fig. 01 — Wordmark", "late");
+    note(R + off, base + off + 20, "Aaliyah Rose / 2026", "r late optional");
+  }
+
+  // ---- the logo animation: a T-square sweeps across and inks the wordmark, then the crop marks go down ----
+  const tsq = document.getElementById("tsq"), tsqLabel = tsq.querySelector("span");
+  const ease = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  function sweep(dur = 1900) {
+    const { L, w, asc, base } = box;
+    tsq.style.top = `${asc - 30}px`; tsq.style.height = `${base - asc + 60}px`;
+    document.body.classList.add("sweeping");
+    const t0 = performance.now();
+    return new Promise(done => (function step(now) {
+      const p = Math.min(1, (now - t0) / dur), e = ease(p), x = L + e * w;
+      tsq.style.left = `${x}px`; tsqLabel.textContent = `X ${String(Math.round(e * w)).padStart(4, "0")}`;
+      mark.style.clipPath = `inset(-20% ${(1 - e) * 100}% -20% 0)`;
+      if (p < 1) requestAnimationFrame(step);
+      else { mark.style.clipPath = "none"; document.body.classList.remove("sweeping"); document.body.classList.add("done"); done(); }
+    })(t0));
   }
 
   // ---- cursor: crosshair + coordinates ----
@@ -239,25 +314,15 @@
   const tick = () => { clock.textContent = `Los Angeles ${new Date().toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hour12: false })}`; };
   tick(); setInterval(tick, 15000);
 
-  // ---- boot: inline the wordmark (so it takes the ink colour), then draw the sheet ----
-  Promise.all([fetch("../shared/wordmark.svg").then(r => r.text()), fetch("../shared/trace-wordmark.svg").then(r => r.text())]).then(([svg, trace]) => {
+  // ---- boot: inline the wordmark (so it takes the ink colour), draw the sheet, then sweep ----
+  fetch("../shared/wordmark.svg").then(r => r.text()).then(async svg => {
     mark.innerHTML = svg;
-    const traceEl = document.getElementById("trace-wordmark");
-    traceEl.outerHTML = trace.replace("<svg", '<svg id="trace-wordmark" hidden');
-    const word = mark.querySelector("svg");
-    requestAnimationFrame(() => { build(); requestAnimationFrame(() => document.body.classList.add("ready")); });
-    // the sketch: a grainy pencil outline traces the original strokes, then ink bleeds in and stays
-    const wInk = Ink.filter(word, { rough: 2.2 });
-    const wPen = Ink.pencil(word, { width: 0.9, trace: document.getElementById("trace-wordmark") });
-    (async () => {
-      if (Ink.reduce) return;
-      await Ink.wait(80);
-      wPen.draw(1400, 40);
-      await Ink.wait(1400 + 15 * 40 + 350);
-      await Ink.bleedIn(wInk, 2200);
-      wPen.fade(0, 900);
-      const stopBoil = Ink.boil(wInk); await Ink.wait(1400); stopBoil();
-    })();
+    await new Promise(r => requestAnimationFrame(r));
+    build();
+    requestAnimationFrame(() => document.body.classList.add("ready"));
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { mark.style.clipPath = "none"; document.body.classList.add("done"); return; }
+    await new Promise(r => setTimeout(r, 1100));
+    sweep();
   });
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { build(); geo.querySelectorAll(".g-draw").forEach(el => el.style.transition = "none"); }, 120); });
 
